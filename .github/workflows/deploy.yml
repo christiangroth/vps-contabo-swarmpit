@@ -1,0 +1,52 @@
+name: Docker Stack Deployment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: appleboy/ssh-action@v1.0.3
+      env:
+        GIT_PROJECT: "vps-contabo-swarmpit"
+        DOCKER_STACK: "swarmpit"
+        TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE: ${{ secrets.TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE }}
+      with:
+        host: ${{ secrets.CONTABO_SSH_HOST }}
+        username: github-deployer
+        key: ${{ secrets.CONTABO_SSH_PRIVATE_KEY }}
+        port: 22
+        envs: GIT_PROJECT,TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE
+        script_stop: true # stop on first failure
+        script: |
+          echo "removing old git repo clone"
+          rm -rf $GIT_PROJECT
+          
+          echo "cloning git repo"
+          GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git clone --depth 1 git@github.com:christiangroth/$GIT_PROJECT.git $GIT_PROJECT
+          cd $GIT_PROJECT
+          
+          echo "deploying docker stack"
+          TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE=$TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE \
+            docker stack deploy --detach=false --prune --with-registry-auth --resolve-image changed -c docker-stack.yml $DOCKER_STACK
+          sleep 5
+          
+          echo
+          echo "----- ----- -----"
+          echo "----- ----- -----"
+          echo "----- ----- -----"
+          echo
+          
+          docker stack ls
+          echo
+          docker stack services $DOCKER_STACK
+          echo
+          docker stack ps $DOCKER_STACK
+          
+          echo "removing git repo clone"
+          cd ..
+          rm -rf $GIT_PROJECT
