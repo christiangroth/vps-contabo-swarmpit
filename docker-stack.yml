@@ -9,7 +9,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:888"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 60s
       timeout: 10s
       retries: 3
@@ -22,7 +22,7 @@ services:
         - "traefik.http.routers.swarmpit.rule=${TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE:?please export TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE}"
         - "traefik.http.routers.swarmpit.entryPoints=websecure"
         - "traefik.http.routers.swarmpit.tls=true"
-        - "traefik.http.services.`swarmpit-svc.loadbalancer.server.port=888"
+        - "traefik.http.services.`swarmpit-svc.loadbalancer.server.port=8080"
         - "traefik.swarm.network=global_router"
       resources:
         limits:
