@@ -20,7 +20,7 @@ jobs:
         username: github-deployer
         key: ${{ secrets.CONTABO_SSH_PRIVATE_KEY }}
         port: 22
-        envs: GIT_PROJECT,TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE
+        envs: GIT_PROJECT,DOCKER_STACK,TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE
         script_stop: true # stop on first failure
         script: |
           echo "removing old git repo clone"
