@@ -22,6 +22,7 @@ services:
         - "traefik.http.routers.swarmpit.rule=${TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE:?please export TRAEFIK_HTTP_ROUTERS_SWARMPIT_RULE}"
         - "traefik.http.routers.swarmpit.entryPoints=websecure"
         - "traefik.http.routers.swarmpit.tls=true"
+        - "traefik.http.routers.swarmpit.tls.certResolver=le"
         - "traefik.http.services.swarmpit-svc.loadbalancer.server.port=8080"
         - "traefik.swarm.network=global_router"
       resources:
